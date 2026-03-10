@@ -1,0 +1,115 @@
+.gradient-custom {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(107, 42, 42, 1) 50%,
+        rgba(26, 23, 5, 1 ) 100%
+    );
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.form-check-input {
+    background-color: #212529;
+    border: 2px solid #6c757d;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+
+
+body.gradient-custom {
+    background: linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgba(107, 42, 42, 1) 50%, rgba(26, 23, 5, 1) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-img-container {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-img-container img, .profile-placeholder {
+    border: 5px solid #fff;
+    transition: transform 0.3s ease;
+}
+
+.profile-img-container img:hover {
+    transform: scale(1.03);
+}
+
+.section-title {
+    border-left: 4px solid #6b2a2a;
+    padding-left: 15px;
+    font-weight: 700;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.info-label {
+    color: #6c757d;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.info-value {
+    color: #212529;
+    font-weight: 500;
+}
+
+.address-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.address-card:hover {
+    background: #fff;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    transform: translateY(-5px);
+}
+
+.badge-role {
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: #6b2a2a; 
+    color: white;
+    font-size: 0.85rem;
+}
+
+
+.form-check-input {
+    background-color: #212529;
+    border: 2px solid #6c757d;
+}
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.form-check-input { background-color: #212529; border: 2px solid #6c757d; }
+.form-check-input:checked { background-color: #0d6efd; border-color: #0d6efd; }
+
+.btn-edit-photo {
+    position: absolute; bottom: 10px; right: 10px;
+    border-radius: 50%; width: 45px; height: 45px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}

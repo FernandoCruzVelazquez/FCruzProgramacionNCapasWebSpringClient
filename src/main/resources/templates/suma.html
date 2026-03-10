@@ -1,0 +1,48 @@
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        
+        <div class = "container">
+            
+            <div>
+                Suma: <span th:text="${n1}"></span> + <span th:text="${n2}"></span> = <span th:text="${n1 + n2}"></span>
+            </div>
+
+            <div class="container" style="height: 20px;"></div>
+
+            <div>
+                Resta: <span th:text="${n1}"></span> - <span th:text="${n2}"></span> = <span th:text="${n1 - n2}"></span>
+            </div>
+
+            <div class="container" style="height: 20px;"></div>
+
+            <div>
+                Multiplicación: <span th:text="${n1}"></span> * <span th:text="${n2}"></span> = <span th:text="${n1 * n2}"></span>
+            </div>
+
+            <div class="container" style="height: 20px;"></div>
+
+            <div>
+                Divición: <span th:text="${n1}"></span> / <span th:text="${n2}"></span> = <span th:text="${n1 / n2}"></span>
+            </div>
+
+            <div class="container" style="height: 20px;"></div>
+
+            <div>
+                Factorial de <span th:text="${n1}"></span> = <span th:text="${factorialN1}"></span>
+            </div>
+
+            <div class="container" style="height: 20px;"></div>
+
+            <div>
+                Factorial de <span th:text="${n2}"></span> = <span th:text="${factorialN2}"></span>
+            </div>
+            
+        </div>
+
+    </body>
+</html>

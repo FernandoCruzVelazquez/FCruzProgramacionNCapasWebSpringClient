@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Carga de Usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/cargaMasiva.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="gradient-custom d-flex align-items-center">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+
+                <div class="col-12 mb-3 text-end">
+                    <a th:href="@{/Usuario}" class="btn btn-outline-light btn-sm rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-arrow-left me-2"></i>Regresar
+                    </a>
+                </div>
+                
+                <div id="contenedorPrincipal">
+                    <button id="btnMostrarOpciones" onclick="activarOpciones()" class="btn btn-nuevo-usuario btn-lg rounded-pill px-5 py-3 shadow-lg">
+                        <i class="bi bi-cloud-arrow-up-fill me-2 fs-4"></i> Mostrar Formulario de Carga
+                    </button>
+                </div>
+
+                <div th:if="${errores != null and !errores.empty}" class="container mt-5">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header bg-danger text-white py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i> 
+                                Errores encontrados en la carga
+                            </h5>
+                        </div>
+                        <div class="card-body bg-light">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th scope="col" class="text-center">Fila</th>
+                                            <th scope="col">Campo</th>
+                                            <th scope="col">Descripción del Error</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="error : ${errores}">
+                                            <td class="text-center fw-bold text-danger" th:text="${error.fila}"></td>
+                                            <td><span class="badge bg-secondary" th:text="${error.dato}"></span></td>
+                                            <td class="text-muted" th:text="${error.descripcion}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer text-end bg-white">
+                            <small class="text-muted">Por favor, corrige el archivo y vuelve a intentarlo.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${exito}" class="container mt-5">
+                    <div class="alert alert-success shadow-lg border-0 rounded-4 d-flex align-items-center p-4" role="alert">
+                        <i class="bi bi-check-circle-fill fs-1 me-3"></i>
+                        <div>
+                            <h4 class="alert-heading mb-1 fw-bold">¡Carga Completada!</h4>
+                            <p class="mb-0">El archivo se ha cargado completamente listo para ser porcesado.</p>
+                        </div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+
+                <div th:if="${exito != null and exito and (errores == null or errores.empty)}"
+                    class="container mt-3 text-center">
+
+                    <a th:href="@{/Usuario/cargamasiva/procesar}"
+                    class="btn btn-primary btn-lg shadow-sm px-5 rounded-pill">
+                        <i class="bi bi-gear-fill me-2"></i>
+                        Procesar archivo
+                    </a>
+
+                </div>
+
+                <div th:if="${errores != null and !errores.empty}" class="container mt-5">
+                </div>
+
+                <div id="seccionOpciones" class="d-none animate-fade">
+                    <div class="table-responsive">
+                        <h3 class="text-white mb-4 fw-bold">Seleccione el formato</h3>
+                        <div class="d-grid gap-3 d-sm-flex justify-content-center">
+                            <button id="btnTxt" onclick="mostrarFormularioEspecifico('txt')" class="btn btn-outline-light rounded-pill px-4 py-2">
+                                <i class="bi bi-filetype-txt me-2"></i>Archivo TXT
+                            </button>
+                            <button id="btnExcel" onclick="mostrarFormularioEspecifico('excel')" class="btn btn-outline-light rounded-pill px-4 py-2">
+                                <i class="bi bi-file-earmark-excel me-2"></i>Archivo Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="formTxt" class="d-none mt-4 animate-fade">
+                    <div class="table-responsive border-info">
+                        <h4 class="text-white mb-3">Subir Archivo <span class="text-info">TXT</span></h4>
+                        <form th:action="@{/Usuario/cargamasiva}" method="post" enctype="multipart/form-data">
+                            <input type="file" id="archivoTxt" class="form-control mb-3" name="archivo" accept=".txt" required>
+                            <div class="d-flex gap-2">
+                                <button type="button" onclick="regresarOpciones()" class="btn btn-outline-secondary rounded-pill px-3">Volver</button>
+                                <button type="submit" class="btn btn-nuevo-usuario-txt flex-grow-1 rounded-pill" id="cargaMasiva">Subir TXT</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="formExcel" class="d-none mt-4 animate-fade">
+                    <div class="table-responsive border-success">
+                        <h4 class="text-white mb-3">Subir Archivo <span class="text-success">Excel</span></h4>
+                        <form th:action="@{/Usuario/cargamasiva}" method="post" enctype="multipart/form-data">
+                            <input type="file" id="archivoExcel" class="form-control mb-3" name="archivo" accept=".xlsx, .xls" required>
+                            <div class="d-flex gap-2">
+                                <button type="button" onclick="regresarOpciones()" class="btn btn-outline-secondary rounded-pill px-3">Volver</button>
+                                <button type="submit" class="btn btn-nuevo-usuario flex-grow-1 rounded-pill" id="cargaMasiva">Subir Excel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:if="${mensaje != null}">
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const mensaje = "[[${mensaje}]]";
+            const tipo = "[[${tipo}]]";
+            const correctos = "[[${correctos}]]";
+            const incorrectos = "[[${incorrectos}]]";
+
+            let icono = "info";
+
+            if(tipo === "success") icono = "success";
+            if(tipo === "error") icono = "error";
+            if(tipo === "warning") icono = "warning";
+
+            Swal.fire({
+
+                title: mensaje,
+
+                html:
+                    `<b>Correctos:</b> ${correctos || 0}<br>
+                    <b>Incorrectos:</b> ${incorrectos || 0}`,
+
+                icon: icono,
+
+                confirmButtonText: "Aceptar",
+
+                background: '#1e1e1e',
+
+                color: '#fff',
+
+                confirmButtonColor: '#3085d6'
+
+            });
+
+        });
+    </script>
+
+    <script th:src="@{/js/CargaMasiva.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
