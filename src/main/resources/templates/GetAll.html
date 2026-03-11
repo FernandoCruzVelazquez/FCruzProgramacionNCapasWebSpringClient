@@ -256,9 +256,7 @@
                                       <i class="bi bi-pencil-square"></i>
                                   </button>
 
-                                    <button type="button"
-                                            class="btn btn-sm btn-danger"
-                                            th:onclick="'confirmarEliminacionDireccion(' + ${direccion.idDireccion} + ')'">
+                                    <button type="button" class="btn btn-danger" th:onclick="'EliminarDireccion(' + ${direccion.idDireccion} + ')'">
                                         <i class="bi bi-trash"></i>
                                     </button>
 
@@ -398,7 +396,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
-      <form th:action="@{/Usuario/GuardarDireccion}" method="post">
+      <form id="formActualizarDireccion" method="post">
         
         <input type="hidden" name="idUsuario" id="direccionIdUsuario">
         <input type="hidden" name="idDireccion" id="direccionId">
@@ -479,9 +477,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
 
-      <form th:action="@{/Usuario/ActualizarFoto}" 
-            method="post" 
-            enctype="multipart/form-data">
+      <form method="post" enctype="multipart/form-data" id="formActualizarFoto">
 
         <div class="modal-header bg-success text-white">
           <h5 class="modal-title">Actualizar Foto</h5>

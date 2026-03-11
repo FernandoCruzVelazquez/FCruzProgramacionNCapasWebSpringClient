@@ -259,42 +259,219 @@ function ejecutarBusqueda() {
 }
 
 function cambiarStatus(idUsuario, checkbox) {
-
     let status = checkbox.checked ? 1 : 0;
 
     $.ajax({
-        url: "/Usuario/UpdateStatus",
-        type: "POST",
-        data: {
-            idUsuario: idUsuario,
-            status: status
-        },
+        url: "http://localhost:8080/Api/Usuario/UpdateStatus/" + idUsuario + "/" + status,
+        type: "PUT", 
         success: function (result) {
-
             if (result.correct) {
-
                 let label = $(checkbox).next('.status-label');
-
+                
                 if (status === 1) {
                     label.text("Activo");
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    Toast.fire({ icon: 'success', title: 'Usuario activado' });
                 } else {
                     label.text("Inactivo");
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    Toast.fire({ icon: 'warning', title: 'Usuario desactivado' });
                 }
-
             } else {
-
                 Swal.fire('Error', result.errorMessage, 'error');
-
-                checkbox.checked = !checkbox.checked;
+                checkbox.checked = !checkbox.checked; 
             }
         },
         error: function () {
-
-            Swal.fire('Error', 'No se pudo actualizar el status', 'error');
-
-            checkbox.checked = !checkbox.checked;
-
+            Swal.fire('Error', 'No se pudo conectar con el servicio de status', 'error');
+            checkbox.checked = !checkbox.checked; 
         }
     });
 }
 
+
+
+$(document).ready(function() {
+    $("#formActualizarDireccion").on("submit", function(e) {
+        e.preventDefault(); 
+
+        var direccion = {
+            idDireccion: $("#direccionId").val(),
+            calle: $("#direccionCalle").val(),
+            numeroExterior: $("#direccionNoExt").val(),
+            NumeroIInteriori: $("#direccionNoInt").val(),
+            colonia: {
+                idColonia: $("#direccionColonia").val()
+            }
+        };
+
+        $.ajax({
+            url: "http://localhost:8080/Api/Direccion",
+            type: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify(direccion),
+            success: function(response) {
+                if (response.correct) {
+                    Swal.fire({
+                        title: '¡Actualizado!',
+                        text: 'La dirección se guardó correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: response.errorMessage || 'No se pudo actualizar',
+                        icon: 'error',
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    title: 'Error de Red',
+                    text: 'No se pudo conectar con el servidor',
+                    icon: 'warning',
+                    confirmButtonText: 'Cerrar'
+                });
+            }
+        });
+    });
+});
+
+function EliminarDireccion(idDireccion) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "http://localhost:8080/Api/Direccion/" + idDireccion,
+                type: "DELETE",
+                success: function(response) {
+                    if (response.correct) {
+                        Swal.fire(
+                            '¡Eliminado!',
+                            'La dirección ha sido borrada.',
+                            'success'
+                        ).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.errorMessage, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'No se pudo comunicar con el servidor', 'error');
+                }
+            });
+        }
+    });
+}
+
+
+$(document).ready(function() {
+    $("#modalFoto form").on("submit", function(e) {
+        e.preventDefault();
+
+        var idUsuario = $("#fotoIdUsuario").val();
+        var formData = new FormData();
+        formData.append("imagen", $("input[name='archivoFoto']")[0].files[0]);
+
+        $.ajax({
+            url: "http://localhost:8080/Api/Usuario/Foto/" + idUsuario,
+            type: "POST",
+            data: formData,
+            processData: false,  
+            contentType: false,  
+            success: function(response) {
+                if (response.correct) {
+                    Swal.fire({
+                        title: '¡Actualizado!',
+                        text: 'La foto de perfil se ha actualizado.',
+                        icon: 'success'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Error', 'No se pudo procesar la imagen', 'error');
+                }
+            },
+            error: function() {
+                Swal.fire('Error', 'Hubo un fallo en la conexión con el servidor', 'error');
+            }
+        });
+    });
+});
+
+function previewImagen(event) {
+    var reader = new FileReader();
+    reader.onload = function() {
+        var output = document.getElementById('previewNuevaFoto');
+        output.src = reader.result;
+        output.style.display = 'block';
+    }
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+function cargarIdUsuarioFoto(element) {
+    var id = $(element).data('id');
+    $("#fotoIdUsuario").val(id);
+    $("#previewNuevaFoto").hide().attr('src', '');
+}
+
+function confirmarEliminacionUsuario(idUsuario) {
+    Swal.fire({
+        title: '¿Eliminar usuario?',
+        text: "Esta acción borrará al usuario y toda su información relacionada (direcciones, etc.)",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar permanentemente',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "http://localhost:8080/Api/Usuario/" + idUsuario,
+                type: "DELETE",
+                success: function(response) {
+                    if (response.correct) {
+                        Swal.fire(
+                            '¡Eliminado!',
+                            'El usuario ha sido removido del sistema.',
+                            'success'
+                        ).then(() => {
+                            location.reload(); 
+                        });
+                    } else {
+                        Swal.fire('Error', response.errorMessage, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'No se pudo conectar con el servidor de la API', 'error');
+                }
+            });
+        }
+    });
+}

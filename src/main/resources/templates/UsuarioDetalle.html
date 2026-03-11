@@ -162,8 +162,7 @@
                         <h5 class="section-title mb-4">Ubicaciones Registradas</h5>
                         <button class="btn btn-primary btn-sm rounded-pill px-3" 
                                 data-bs-toggle="modal" 
-                                data-bs-target="#modalEditarDireccion"
-                                onclick="prepararNuevaDireccion()">
+                                data-bs-target="#modalNuevaDireccion">
                             <i class="bi bi-plus-circle me-2"></i>Añadir Dirección
                         </button>
                         
@@ -219,7 +218,7 @@
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button class="btn btn-sm btn-outline-danger border-0"
-                                                th:onclick="'confirmarEliminacionDireccion(' + ${direccion.idDireccion} + ')'">
+                                                th:onclick="'EliminarDireccion(' + ${direccion.idDireccion} + ')'">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
@@ -353,7 +352,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
-      <form th:action="@{/Usuario/DetalleGuardarDireccion}" method="post">
+      <form id="formActualizarDireccion" method="post">
         
         <input type="hidden" name="idUsuario" id="direccionIdUsuario">
         <input type="hidden" name="idDireccion" id="direccionId">
@@ -435,9 +434,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
 
-      <form th:action="@{/Usuario/DetalleActualizarFoto}" 
-            method="post" 
-            enctype="multipart/form-data">
+      <form method="post" enctype="multipart/form-data" id="formActualizarFoto">
 
         <div class="modal-header bg-success text-white">
           <h5 class="modal-title">Actualizar Foto</h5>
@@ -475,6 +472,76 @@
 
     </div>
   </div>
+</div>
+
+
+
+<div class="modal fade" id="modalNuevaDireccion" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-geo-alt-fill me-2"></i>Nueva Dirección</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNuevaDireccion">
+                    <input type="hidden" id="nuevoIdUsuario" th:value="${usuario.idUsuario}">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Calle</label>
+                            <input type="text" id="nuevoCalle" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">No. Ext</label>
+                            <input type="text" id="nuevoNoExt" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">No. Int</label>
+                            <input type="text" id="nuevoNoInt" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">País</label>
+                            <select id="nuevoPais" class="form-select" 
+                                    onchange="cargarSelect(`http://localhost:8080/Api/Estado/Pais/${this.value}`, 'nuevoEstado', 'idEstado')">
+                                <option value="">-- Seleccione --</option>
+                                <option th:each="pais : ${paises}" th:value="${pais.idPais}" th:text="${pais.nombre}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Estado</label>
+                            <select id="nuevoEstado" class="form-select"
+                                    onchange="cargarSelect(`http://localhost:8080/Api/Municipio/Estado/${this.value}`, 'nuevoMunicipio', 'idMunicipio')">
+                                <option value="">-- Seleccione --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Municipio</label>
+                            <select id="nuevoMunicipio" class="form-select"
+                                    onchange="cargarSelect(`http://localhost:8080/Api/Colonia/Municipio/${this.value}`, 'nuevoColonia', 'idColonia')">
+                                <option value="">-- Seleccione --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Colonia</label>
+                            <select id="nuevoColonia" class="form-select" onchange="actualizarCP(this)">
+                                <option value="">-- Seleccione --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Código Postal</label>
+                            <input type="text" id="nuevoCP" class="form-control" readonly placeholder="CP">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="insertarDireccion()">Guardar Dirección</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 
