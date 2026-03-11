@@ -36,44 +36,55 @@ document.addEventListener("DOMContentLoaded", function () {
     const switchStatus = document.getElementById("editStatus");
     const hiddenStatus = document.getElementById("statusHidden");
 
-    switchStatus.addEventListener("change", function () {
-        hiddenStatus.value = this.checked ? 1 : 0;
-        console.log("Nuevo status:", hiddenStatus.value);
-    });
+    if (switchStatus) {
+        switchStatus.addEventListener('change', function() {
+            switchStatus.addEventListener("change", function () {
+            hiddenStatus.value = this.checked ? 1 : 0;
+            console.log("Nuevo status:", hiddenStatus.value);
+        });
+        });
+    }
 
 });
 
 
 async function cargarSelect(url, selectId, idKey, selectedId = null) {
     const select = document.getElementById(selectId);
+    if (!select) return; 
+    
     select.innerHTML = '<option value="">-- Seleccione --</option>';
 
-    const response = await fetch(url);
-    const data = await response.json();
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
 
-    const lista = data.objects;
-    if (!Array.isArray(lista)) return;
+        const lista = data.objects || data; 
+        if (!Array.isArray(lista)) return;
 
-    lista.forEach(obj => {
-        const option = document.createElement('option');
+        lista.forEach(obj => {
+            const option = document.createElement('option');
+            
+            const value = obj[idKey] || obj[idKey.charAt(0).toLowerCase() + idKey.slice(1)];
+            const texto = obj.nombre || obj.Nombre;
 
-        option.value = obj[idKey];
-        option.textContent = obj.Nombre;
-
-        if (selectId === 'direccionColonia') {
-            option.dataset.cp = obj.CodigoPostal;
-        }
-
-        if (String(option.value) === String(selectedId)) {
-            option.selected = true;
+            option.value = value;
+            option.textContent = texto;
 
             if (selectId === 'direccionColonia') {
-                document.getElementById('direccionCP').value = obj.CodigoPostal;
+                option.dataset.cp = obj.codigoPostal || obj.CodigoPostal;
             }
-        }
 
-        select.appendChild(option);
-    });
+            if (String(value) === String(selectedId)) {
+                option.selected = true;
+                if (selectId === 'direccionColonia') {
+                    document.getElementById('direccionCP').value = option.dataset.cp;
+                }
+            }
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error cargando select:", error);
+    }
 }
 
 document.getElementById('direccionColonia')
@@ -104,9 +115,9 @@ document.querySelectorAll('.btnEditarDireccion').forEach(button => {
 
         if (idpais) {
             await cargarSelect(
-                `http://localhost:8081/Api/Estado/Pais/${idpais}`,
+                `http://localhost:8080/Api/Estado/Pais/${idpais}`,
                 'direccionEstado',
-                'IdEstado',
+                'idEstado',
                 idestado
             );
 
@@ -114,7 +125,7 @@ document.querySelectorAll('.btnEditarDireccion').forEach(button => {
                 await cargarSelect(
                     `http://localhost:8080/Api/Municipio/Estado/${idestado}`,
                     'direccionMunicipio',
-                    'IdMunicipio',
+                    'idMunicipio',
                     idmunicipio
                 );
 
@@ -122,7 +133,7 @@ document.querySelectorAll('.btnEditarDireccion').forEach(button => {
                     await cargarSelect(
                         `http://localhost:8080/Api/Colonia/Municipio/${idmunicipio}`,
                         'direccionColonia',
-                        'IdColonia',
+                        'idColonia',
                         idcolonia
                     );
                 }
@@ -130,6 +141,7 @@ document.querySelectorAll('.btnEditarDireccion').forEach(button => {
         }
     });
 });
+
 
 
 document.getElementById('direccionPais').addEventListener('change', e => {
@@ -141,7 +153,7 @@ document.getElementById('direccionPais').addEventListener('change', e => {
         cargarSelect(
             `http://localhost:8080/Api/Estado/Pais/${e.target.value}`,
             'direccionEstado',
-            'IdEstado'
+            'idEstado'
         );
     }
 });
@@ -154,7 +166,7 @@ document.getElementById('direccionEstado').addEventListener('change', e => {
         cargarSelect(
             `http://localhost:8080/Api/Municipio/Estado/${e.target.value}`,
             'direccionMunicipio',
-            'IdMunicipio'
+            'idMunicipio'
         );
     }
 });
@@ -166,7 +178,7 @@ document.getElementById('direccionMunicipio').addEventListener('change', e => {
         cargarSelect(
             `http://localhost:8080/Api/Colonia/Municipio/${e.target.value}`,
             'direccionColonia',
-            'IdColonia'
+            'idColonia'
         );
     }
 });
@@ -217,7 +229,7 @@ function ejecutarBusqueda() {
     }
 
     $.ajax({
-        url: "/Usuario/GetById/" + id,
+        url: "http://localhost:8080/Api/Usuario/GetById/" + id,
         type: "GET",
         dataType: "json",
         success: function(u) {

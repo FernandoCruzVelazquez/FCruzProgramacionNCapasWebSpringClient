@@ -6,8 +6,15 @@ public class Result {
     public boolean correct;
     public String errorMessage;
     public Exception ex;
-    public Object object; //devuelve valor de un solo objeto
-    public List<Object> objects; //devuleve más de un solo objeto 
-
+    public Object object; 
+    public List<Object> objects; 
     
+    public boolean isCorrect() {
+        return correct;
+    }
+
+    public void setCorrect(boolean correct) {
+        this.correct = correct;
+    }
+
 }

@@ -63,7 +63,7 @@
                             <p class="text-muted mb-3" th:text="${usuario.apellidosMaterno}"></p>
                             
                             <div class="mb-4">
-                                <span class="badge-role" th:text="${usuario.Rol.NombreRol}"></span>
+                                <span class="badge-role" th:text="${usuario.rol.nombreRol}"></span>
                             </div>
 
                             <div class="d-grid gap-2">
@@ -80,7 +80,7 @@
                                         th:data-celular="${usuario.celular}"
                                         th:data-telefono="${usuario.telefono}"
                                         th:data-idrol="${usuario.rol.idRol}"
-                                        th:data-fechanacimiento="${#dates.format(usuario.fechaNacimiento, 'yyyy-MM-dd')}"
+                                        th:data-fechanacimiento="${#strings.substring(usuario.fechaNacimiento,0,10)}"
                                         th:data-password="${usuario.password}"
                                         th:data-sexo="${usuario.sexo}"
                                         th:data-curp="${usuario.CURP}"
@@ -119,7 +119,7 @@
                                     <div class="info-label">Fecha de Nacimiento</div>
                                     <div class="info-value">
                                         <i class="bi bi-calendar3 me-1"></i>
-                                        <span th:text="${#dates.format(usuario.fechaNacimiento, 'dd MMMM, yyyy')}"></span>
+                                        <span th:text="${#strings.substring(usuario.fechaNacimiento,0,10)}"></span>
                                     </div>
                                 </div>
                             </div>
@@ -190,7 +190,7 @@
                                     <div class="row g-2 mb-3">
                                         <div class="col-6">
                                             <small class="text-muted d-block">Número</small>
-                                            <span class="small fw-medium" th:text="|Ext: ${direccion.numeroExterior} / Int: ${direccion.numeroIInteriori}|"></span>
+                                            <span class="small fw-medium" th:text="|Ext: ${direccion.numeroExterior} / Int: ${direccion.NumeroIInteriori}|"></span>
                                         </div>
                                         <div class="col-6">
                                             <small class="text-muted d-block">Colonia</small>
@@ -210,7 +210,7 @@
                                                 th:data-idusuario="${usuario.idUsuario}"
                                                 th:data-calle="${direccion.calle}"
                                                 th:data-noext="${direccion.numeroExterior}"
-                                                th:data-noint="${direccion.numeroIInteriori}"
+                                                th:data-noint="${direccion.NumeroIInteriori}"
                                                 th:data-cp="${direccion.colonia.codigoPostal}"
                                                 th:data-idpais="${direccion.colonia.municipio.estado.pais.idPais}"
                                                 th:data-idestado="${direccion.colonia.municipio.estado.idEstado}"
@@ -252,6 +252,7 @@
           <input type="hidden" id="idUsuario" name="idUsuario">
           <input type="hidden" id="fechaNacimiento" name="fechaNacimiento">
           <input type="hidden" id="password" name="password">
+          <input type="hidden" id="status" value="1">
 
 
           <div class="row">
@@ -287,7 +288,7 @@
 
             <div class="col-md-6">
             <label>CURP</label>
-            <input type="text" class="form-control" id="CURP" name="CURP">
+            <input type="text" id="curp" class="form-control" name="CURP">
             </div>
 
 
@@ -300,11 +301,10 @@
               <label class="fw-bold">Rol</label>
               <select class="form-control" id="rol" name="rol.idRol">
                   <option value="">-- Seleccione un rol --</option>
-
                   <option th:each="rol : ${roles}"
-                          th:value="${rol.IdRol}"
-                          th:text="${rol.NombreRol}">
-                  </option>
+                            th:value="${rol.idRol}"
+                            th:text="${rol.nombreRol}">
+                    </option>
               </select>
           </div>
 
@@ -337,7 +337,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Guardar cambios</button>
+          <button type="button" class="btn btn-success" onclick="actualizarUsuario()">Guardar cambios</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         </div>
 

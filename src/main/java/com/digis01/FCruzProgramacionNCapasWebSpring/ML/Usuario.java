@@ -13,6 +13,7 @@ public class Usuario {
     private String apellidoPaterno;
     private String apellidosMaterno;
     private String email;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date fechaNacimiento;
     private String telefono;
     private String celular;

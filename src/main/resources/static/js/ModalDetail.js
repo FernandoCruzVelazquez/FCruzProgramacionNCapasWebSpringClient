@@ -2,9 +2,10 @@ console.log("JS cargado y actualizado");
 
 
 function cargarUsuario(btn) {
-    const idRol = btn.dataset.idrol; 
+
+    const idRol = btn.dataset.idrol;
     const selectRol = document.getElementById("rol");
-    
+
     document.getElementById("idUsuario").value = btn.dataset.id || "";
     document.getElementById("userName").value = btn.dataset.username || "";
     document.getElementById("nombre").value = btn.dataset.nombre || "";
@@ -13,85 +14,148 @@ function cargarUsuario(btn) {
     document.getElementById("email").value = btn.dataset.email || "";
     document.getElementById("telefono").value = btn.dataset.telefono || "";
     document.getElementById("celular").value = btn.dataset.celular || "";
-    document.getElementById("CURP").value = btn.dataset.curp || "";
+    document.getElementById("curp").value = btn.dataset.curp || "";
     document.getElementById("fechaNacimiento").value = btn.dataset.fechanacimiento || "";
     document.getElementById("password").value = btn.dataset.password || "";
 
-    if (idRol && selectRol) {
-
+    setTimeout(() => {
         selectRol.value = idRol;
-        
-        console.log("Intentando asignar Rol ID:", idRol);
-        console.log("Valores disponibles en select:", Array.from(selectRol.options).map(o => o.value));
-    } else {
-        console.warn("No se encontró el idRol o el select");
-    }
+    }, 50);
 
     let sexo = (btn.dataset.sexo || "").trim();
+
     if (sexo === "M") {
         document.getElementById("sexoM").checked = true;
-    } else if (sexo === "F") {
+    } 
+    else if (sexo === "F") {
         document.getElementById("sexoF").checked = true;
     }
+}
 
+
+function actualizarUsuario(){
+
+    var usuario = {
+
+        idUsuario: parseInt($("#idUsuario").val()),
+        userName: $("#userName").val(),
+        nombre: $("#nombre").val(),
+        apellidoPaterno: $("#apellidoPaterno").val(),
+        apellidosMaterno: $("#apellidoMaterno").val(),
+        email: $("#email").val(),
+        telefono: $("#telefono").val(),
+        celular: $("#celular").val(),
+        sexo: $("input[name='sexo']:checked").val(),
+        fechaNacimiento: $("#fechaNacimiento").val(),
+
+        password: $("#password").val() || "",
+        curp: $("#curp").val() || "",
+        status: parseInt($("#status").val() || 1),
+
+        rol:{
+            idRol: parseInt($("#rol").val())
+        }
+
+    };
+
+    console.log(usuario);
+
+    $.ajax({
+
+        url: "http://localhost:8080/Api/Usuario/Update",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(usuario),
+
+        success: function(response){
+
+            if(response.correct){
+
+                Swal.fire({
+                    icon:"success",
+                    title:"Usuario actualizado"
+                }).then(()=>{
+                    location.reload();
+                });
+
+            }else{
+
+                Swal.fire({
+                    icon:"error",
+                    title:"Error",
+                    text:response.errorMessage
+                });
+
+            }
+
+        }
+
+    });
 
 }
 
-// --- CARGAR DIRECCIÓN ---
-// Usamos delegación de eventos para asegurar que siempre detecte el click
+
 document.addEventListener('click', async function(e) {
     const btn = e.target.closest('.btnEditarDireccion');
     if (!btn) return;
 
-    // Extraer datos del dataset (JS los convierte a minúsculas automáticamente)
     const { id, idusuario, calle, noext, noint, cp, idpais, idestado, idmunicipio, idcolonia } = btn.dataset;
 
-    // Llenar campos básicos
-    document.getElementById('direccionId').value = id;
-    document.getElementById('direccionIdUsuario').value = idusuario;
-    document.getElementById('direccionCalle').value = calle;
-    document.getElementById('direccionNoExt').value = noext;
-    document.getElementById('direccionNoInt').value = noint;
-    document.getElementById('direccionCP').value = cp;
+    document.getElementById('direccionId').value = id || '';
+    document.getElementById('direccionIdUsuario').value = idusuario || '';
+    document.getElementById('direccionCalle').value = calle || '';
+    document.getElementById('direccionNoExt').value = noext || '';
+    document.getElementById('direccionNoInt').value = noint || '';
+    document.getElementById('direccionCP').value = cp || '';
 
-    // Cascada de Selects
     if (idpais) {
         document.getElementById('direccionPais').value = idpais;
         
-        await cargarSelect(`/Usuario/getEstadosByPais/${idpais}`, 'direccionEstado', 'IdEstado', idestado);
+        await cargarSelect(`http://localhost:8080/Api/Estado/Pais/${idpais}`, 'direccionEstado', 'idEstado', idestado);
         
         if (idestado) {
-            await cargarSelect(`/Usuario/getMunicipioByEstado/${idestado}`, 'direccionMunicipio', 'IdMunicipio', idmunicipio);
+            await cargarSelect(`http://localhost:8080/Api/Municipio/Estado/${idestado}`, 'direccionMunicipio', 'idMunicipio', idmunicipio);
             
             if (idmunicipio) {
-                await cargarSelect(`/Usuario/getColoniaByMunicipios/${idmunicipio}`, 'direccionColonia', 'IdColonia', idcolonia);
+                await cargarSelect(`http://localhost:8080/Api/Colonia/Municipio/${idmunicipio}`, 'direccionColonia', 'idColonia', idcolonia);
             }
         }
     }
+    
 });
 
-// --- FUNCIONES AUXILIARES ---
 async function cargarSelect(url, selectId, idKey, selectedId = null) {
     const select = document.getElementById(selectId);
+    if (!select) return;
+
     select.innerHTML = '<option value="">-- Seleccione --</option>';
 
     try {
         const response = await fetch(url);
         const data = await response.json();
-        const lista = data.objects || [];
+        
+        const lista = Array.isArray(data) ? data : (data.objects || data.result || []);
+
+        if (lista.length === 0) {
+            console.warn(`La API en ${url} devolvió una lista vacía.`);
+        }
 
         lista.forEach(obj => {
             const option = document.createElement('option');
-            option.value = obj[idKey];
-            option.textContent = obj.Nombre;
+            
+            option.value = obj[idKey]; 
+            
+            option.textContent = obj.Nombre || obj.nombre || 'Sin Nombre';
             
             if (selectId === 'direccionColonia') {
-                option.dataset.cp = obj.CodigoPostal;
+                option.dataset.cp = obj.CodigoPostal || obj.codigoPostal;
             }
 
-            if (String(option.value) === String(selectedId)) {
+            if (selectedId && String(obj[idKey]) === String(selectedId)) {
+                option.setAttribute('selected', 'selected'); 
                 option.selected = true;
             }
+            
             select.appendChild(option);
         });
     } catch (error) {
@@ -99,25 +163,10 @@ async function cargarSelect(url, selectId, idKey, selectedId = null) {
     }
 }
 
-// Manejo de cambios manuales en los selects
-document.getElementById('direccionPais').addEventListener('change', e => {
-    limpiarSelect(['direccionEstado', 'direccionMunicipio', 'direccionColonia']);
-    if (e.target.value) cargarSelect(`/Usuario/getEstadosByPais/${e.target.value}`, 'direccionEstado', 'IdEstado');
-});
-
-document.getElementById('direccionEstado').addEventListener('change', e => {
-    limpiarSelect(['direccionMunicipio', 'direccionColonia']);
-    if (e.target.value) cargarSelect(`/Usuario/getMunicipioByEstado/${e.target.value}`, 'direccionMunicipio', 'IdMunicipio');
-});
-
-document.getElementById('direccionMunicipio').addEventListener('change', e => {
-    limpiarSelect(['direccionColonia']);
-    if (e.target.value) cargarSelect(`/Usuario/getColoniaByMunicipios/${e.target.value}`, 'direccionColonia', 'IdColonia');
-});
-
 function limpiarSelect(ids) {
     ids.forEach(id => {
-        document.getElementById(id).innerHTML = '<option value="">-- Seleccione --</option>';
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '<option value="">-- Seleccione --</option>';
     });
 }
 

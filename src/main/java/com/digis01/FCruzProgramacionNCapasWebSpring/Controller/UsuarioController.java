@@ -38,8 +38,14 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -65,6 +71,14 @@ public class UsuarioController {
         if(response.getStatusCode().value() == 200){
             model.addAttribute("usuarios", response.getBody());
         }
+        
+        ResponseEntity<Rol[]> responseRoles = restTemplate.getForEntity(rutaBase + "/Rol", Rol[].class);
+        List<Rol> roles = Arrays.asList(responseRoles.getBody());
+        model.addAttribute("roles", roles);
+        
+        ResponseEntity<Pais[]> responsePaises = restTemplate.getForEntity(rutaBase + "/Pais", Pais[].class);
+        List<Pais> paises = Arrays.asList(responsePaises.getBody());
+        model.addAttribute("paises", paises);
 
         return "GetAll";
     }
@@ -146,6 +160,138 @@ public class UsuarioController {
         return "formulario";
     }
     
+    @PostMapping("/form")
+    public String Accion(@ModelAttribute("usuario") Usuario usuario,  @RequestParam("archivoFoto") MultipartFile archivoFoto, RedirectAttributes redirectAttributes) {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            HttpHeaders headers = new HttpHeaders(); headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();body.add("datos", usuario); 
+
+            if (archivoFoto != null && !archivoFoto.isEmpty()) {
+                body.add("imagen", archivoFoto.getResource());
+            }
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<Result> response = restTemplate.postForEntity(
+                    rutaBase + "/Usuario", requestEntity, Result.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Result result = response.getBody();
+                if (result != null && result.isCorrect()) {
+                    redirectAttributes.addFlashAttribute("success", "¡Excelente! El usuario se guardó con éxito.");
+                    return "redirect:/Usuario"; 
+                } else {
+                    String msg = (result != null) ? result.errorMessage : "No se pudo procesar la solicitud.";
+                    redirectAttributes.addFlashAttribute("error", msg);
+                }
+            } else {
+                redirectAttributes.addFlashAttribute("error", "El servicio no está disponible en este momento.");
+            }
+
+        } catch (HttpClientErrorException | HttpServerErrorException ex) {
+            redirectAttributes.addFlashAttribute("error", "Error en el servidor: Inténtelo más tarde.");
+            System.err.println("Detalle técnico: " + ex.getMessage()); 
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Ocurrió un problema de conectividad.");
+            System.err.println("Excepción: " + ex.toString()); 
+        }
+
+        return "redirect:/Usuario/form";
+    }
+    
+    @GetMapping("/Detalle")
+    public String detalleUsuario(@RequestParam("id") int idUsuario, Model model){
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        Result result = restTemplate.getForObject(
+                rutaBase + "/Usuario/Detalle/" + idUsuario,
+                Result.class
+        );
+
+        model.addAttribute("usuario", result.object);
+
+        ResponseEntity<Pais[]> responsePaises =
+                restTemplate.getForEntity(rutaBase + "/Pais", Pais[].class);
+
+        model.addAttribute("paises", Arrays.asList(responsePaises.getBody()));
+
+        ResponseEntity<Rol[]> responseRoles =
+                restTemplate.getForEntity(rutaBase + "/Rol", Rol[].class);
+
+        model.addAttribute("roles", Arrays.asList(responseRoles.getBody()));
+
+        return "UsuarioDetalle";
+    }
+    
+    
+    @PostMapping("/DetalleGuardarDireccion")
+    public String DetalleGuardarDireccion(@ModelAttribute Direccion direccion,
+            RedirectAttributes redirectAttributes){
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpEntity<Direccion> request = new HttpEntity<>(direccion);
+
+        ResponseEntity<Result> response = restTemplate.exchange(
+                rutaBase + "/Direccion",
+                HttpMethod.PUT,
+                request,
+                Result.class
+        );
+
+        if(response.getBody().isCorrect()){
+            redirectAttributes.addFlashAttribute("success",
+                    "Dirección actualizada correctamente");
+        }else{
+            redirectAttributes.addFlashAttribute("error",
+                    "Error al actualizar la dirección");
+        }
+
+        return "redirect:/Usuario/Detalle?id=" + direccion.getIdUsuario();
+    }
+    
+    @PostMapping("/DetalleActualizarFoto")
+    public String DetalleActualizarFoto(
+            @RequestParam("idUsuario") int idUsuario,
+            @RequestParam("archivoFoto") MultipartFile foto,
+            RedirectAttributes redirectAttributes){
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        try{
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String,Object> body = new LinkedMultiValueMap<>();
+            body.add("imagen", foto.getResource());
+
+            HttpEntity<MultiValueMap<String,Object>> request =
+                    new HttpEntity<>(body, headers);
+
+            ResponseEntity<Result> response = restTemplate.postForEntity(
+                    rutaBase + "/Usuario/Foto/" + idUsuario,
+                    request,
+                    Result.class
+            );
+
+            if(response.getBody().isCorrect()){
+                redirectAttributes.addFlashAttribute("success",
+                        "Foto actualizada correctamente");
+            }
+
+        }catch(Exception e){
+            redirectAttributes.addFlashAttribute("error",
+                    "Error al actualizar la foto");
+        }
+
+        return "redirect:/Usuario/Detalle?id=" + idUsuario;
+    }
 
 //    
 //    @PostMapping("/update")

@@ -1,14 +1,3 @@
-.gradient-custom {
-    background: linear-gradient(
-        90deg,
-        rgba(0, 0, 0, 1) 0%,
-        rgba(107, 42, 42, 1) 50%,
-        rgba(26, 23, 5, 1 ) 100%
-    );
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-
 .form-check-input {
     background-color: #212529;
     border: 2px solid #6c757d;
@@ -22,7 +11,7 @@
 
 
 body.gradient-custom {
-    background: linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgba(107, 42, 42, 1) 50%, rgba(26, 23, 5, 1) 100%);
+    background: linear-gradient(90deg,rgba(56, 56, 56) 0%, rgb(56, 56, 56) 26%, rgb(56, 56, 56) 74%, rgba(56, 56, 56) 100%);
     background-attachment: fixed;
     min-height: 100vh;
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
