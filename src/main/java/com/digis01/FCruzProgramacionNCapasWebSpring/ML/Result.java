@@ -17,4 +17,21 @@ public class Result {
         this.correct = correct;
     }
 
+    public Object getObject() {
+        return object;
+    }
+
+    public void setObject(Object object) {
+        this.object = object;
+    }
+
+    public List<Object> getObjects() {
+        return objects;
+    }
+
+    public void setObjects(List<Object> objects) {
+        this.objects = objects;
+    }
+    
+    
 }

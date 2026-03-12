@@ -52,3 +52,11 @@ const validarArchivo = (e) => {
 
 document.getElementById("archivoTxt").addEventListener("change", validarArchivo);
 document.getElementById("archivoExcel").addEventListener("change", validarArchivo);
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const hayResultados = document.querySelector('.alert-success') || document.querySelector('.table-danger');
+    if (hayResultados) {
+        document.getElementById("contenedorPrincipal").classList.add("d-none");
+    }
+});
