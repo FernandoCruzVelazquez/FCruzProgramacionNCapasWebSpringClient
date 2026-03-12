@@ -2,6 +2,8 @@ package com.digis01.FCruzProgramacionNCapasWebSpring.Controller;
 
 import com.digis01.FCruzProgramacionNCapasWebSpring.ML.Result;
 import jakarta.servlet.http.HttpSession;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("CargaMasiva")
@@ -58,5 +61,50 @@ public class CargaMasivaController {
         return "CargaMasiva";
     }
     
-    
+    @GetMapping("/Procesar")
+    public String procesarArchivo(HttpSession session, RedirectAttributes redirectAttributes) {
+
+        try {
+
+            String key = (String) session.getAttribute("keyArchivo");
+
+            if (key == null) {
+                redirectAttributes.addFlashAttribute("mensaje", "No hay archivo para procesar");
+                redirectAttributes.addFlashAttribute("tipo", "error");
+                return "redirect:/Usuario";
+            }
+
+            String keyEncoded = URLEncoder.encode(key, StandardCharsets.UTF_8);
+
+            String urlService = rutaBase + "/procesar/" + keyEncoded;
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<Result> response =
+                    restTemplate.getForEntity(urlService, Result.class);
+
+            if (response.getBody() != null && response.getBody().isCorrect()) {
+
+                redirectAttributes.addFlashAttribute("mensaje", "Archivo procesado correctamente");
+                redirectAttributes.addFlashAttribute("tipo", "success");
+
+                redirectAttributes.addFlashAttribute("correctos", response.getBody().getCorrectos());
+                redirectAttributes.addFlashAttribute("incorrectos", response.getBody().getIncorrectos());
+
+            } else {
+
+                redirectAttributes.addFlashAttribute("mensaje", "Error al procesar el archivo");
+                redirectAttributes.addFlashAttribute("tipo", "error");
+
+            }
+
+        } catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute("mensaje", e.getMessage());
+            redirectAttributes.addFlashAttribute("tipo", "error");
+
+        }
+
+        return "redirect:/Usuario";
+    }
 }

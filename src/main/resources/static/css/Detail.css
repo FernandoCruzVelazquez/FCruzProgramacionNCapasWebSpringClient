@@ -102,3 +102,23 @@ body.gradient-custom {
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
+
+.btn-add-address {
+    background: #6b2a2a;
+    color: white;
+    border-radius: 50px;
+    border: none;
+    padding: 6px 18px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-add-address:hover {
+    background: #4e1e1e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.btn-add-address i {
+    font-size: 1rem;
+}

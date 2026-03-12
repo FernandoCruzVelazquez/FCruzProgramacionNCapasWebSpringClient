@@ -7,7 +7,10 @@ public class Result {
     public String errorMessage;
     public Exception ex;
     public Object object; 
-    public List<Object> objects; 
+    public List<Object> objects;
+    
+    public int correctos;
+    public int incorrectos;
     
     public boolean isCorrect() {
         return correct;
@@ -32,6 +35,15 @@ public class Result {
     public void setObjects(List<Object> objects) {
         this.objects = objects;
     }
+
+    public int getCorrectos() {
+        return correctos;
+    }
+
+    public int getIncorrectos() {
+        return incorrectos;
+    }
+    
     
     
 }

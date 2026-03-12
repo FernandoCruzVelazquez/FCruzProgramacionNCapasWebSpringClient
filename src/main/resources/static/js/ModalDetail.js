@@ -294,7 +294,6 @@ $(document).ready(function() {
 
         var idUsuario = $("#fotoIdUsuario").val();
         var formData = new FormData();
-        // El nombre "imagen" debe coincidir con @RequestParam("imagen") en tu Controller
         formData.append("imagen", $("input[name='archivoFoto']")[0].files[0]);
 
         $.ajax({
@@ -375,25 +374,24 @@ function confirmarEliminacionUsuario(idUsuario) {
     });
 }
 
-
-
 function insertarDireccion() {
+
     const idUsuario = document.getElementById('nuevoIdUsuario').value;
     const idColonia = document.getElementById('nuevoColonia').value;
 
-    if (!idColonia) {
-        Swal.fire('Error', 'Debe seleccionar una colonia', 'error');
-        return;
-    }
-
-    // En INSERTAR
     const direccion = {
         idDireccion: 0,
         calle: document.getElementById('nuevoCalle').value,
         numeroExterior: document.getElementById('nuevoNoExt').value,
-        NumeroIInteriori: document.getElementById('nuevoNoInt').value, // Coincide con @JsonProperty
-        usuario: { idUsuario: parseInt(idUsuario) },
-        colonia: { idColonia: parseInt(idColonia) }
+        NumeroIInteriori: document.getElementById('nuevoNoInt').value,
+
+        usuario: {                      
+            idUsuario: parseInt(idUsuario)
+        },
+
+        colonia: {
+            idColonia: parseInt(idColonia)
+        }
     };
 
     $.ajax({
@@ -401,77 +399,113 @@ function insertarDireccion() {
         type: "POST",
         contentType: "application/json",
         data: JSON.stringify(direccion),
+
         success: function(response) {
+
             if (response.correct) {
-                Swal.fire('¡Registrado!', 'La dirección se guardó con éxito', 'success')
-                    .then(() => location.reload());
+
+                Swal.fire(
+                    '¡Éxito!',
+                    'Registrado correctamente',
+                    'success'
+                ).then(() => location.reload());
+
             } else {
-                Swal.fire('Error', response.errorMessage, 'error');
+
+                Swal.fire(
+                    'Error del Servidor',
+                    response.errorMessage,
+                    'error'
+                );
             }
         },
-        error: function(e) {
-            Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
+
+        error: function () {
+            Swal.fire(
+                'Error',
+                'Error de conexión con el servidor2',
+                'error'
+            );
         }
     });
 }
 
 function guardarDireccionAJAX() {
 
+    const idUsuario = document.getElementById('direccionIdUsuario').value;
+    const idColonia = document.getElementById('direccionColonia').value;
+    const idDireccion = document.getElementById('direccionId').value;
 
-    // En GUARDAR (Asegúrate de agregar los parseInt aquí también)
     const direccionUpdate = {
-        idDireccion: parseInt(document.getElementById('direccionId').value),
+        idDireccion: parseInt(idDireccion),
         calle: document.getElementById('direccionCalle').value,
         numeroExterior: document.getElementById('direccionNoExt').value,
-        NumeroIInteriori: document.getElementById('direccionNoInt').value, // Coincide con @JsonProperty
-        usuario: { idUsuario: parseInt(document.getElementById('direccionIdUsuario').value) },
-        colonia: { idColonia: parseInt(document.getElementById('direccionColonia').value) }
+        NumeroIInteriori: document.getElementById('direccionNoInt').value,
+
+        usuario: {
+            idUsuario: parseInt(idUsuario)
+        },
+
+        colonia: {
+            idColonia: parseInt(idColonia)
+        }
     };
 
-    const url = "http://localhost:8080/Api/Direccion/Add";
-
     $.ajax({
-        url: url,
-        type: "POST",
+
+        url: "http://localhost:8080/Api/Direccion", 
+        type: "PUT",
+
         contentType: "application/json",
-        data: JSON.stringify(direccion),
+        data: JSON.stringify(direccionUpdate),
+
         success: function(response) {
+
             if (response.correct) {
-                Swal.fire('¡Éxito!', 'Dirección guardada correctamente', 'success')
-                    .then(() => location.reload());
+
+                Swal.fire(
+                    '¡Éxito!',
+                    'Actualizado correctamente',
+                    'success'
+                ).then(() => location.reload());
+
             } else {
-                Swal.fire('Error', response.errorMessage, 'error');
+
+                Swal.fire(
+                    'Error',
+                    response.errorMessage,
+                    'error'
+                );
             }
         },
-        error: function() {
-            Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
+
+        error: function () {
+            Swal.fire(
+                'Error',
+                'Error de conexión con el servidor2',
+                'error'
+            );
         }
     });
 }
 
 function actualizarCP(selectElement) {
-    // Obtenemos la opción seleccionada
     const option = selectElement.options[selectElement.selectedIndex];
     
-    // Extraemos el CP del dataset (que se llena en tu función cargarSelect)
     const cp = option.dataset.cp;
     
     const inputCP = document.getElementById('nuevoCP');
     if (inputCP) {
-        inputCP.value = cp || ''; // Si no hay CP, pone vacío
+        inputCP.value = cp || ''; 
     }
 }
 
 $(document).ready(function() {
-    // Escucha cuando el modal se cierra por completo
     $('#modalNuevaDireccion').on('hidden.bs.modal', function () {
-        // 1. Resetea los campos de texto del formulario
         document.getElementById('formNuevaDireccion').reset();
         
-        // 2. Limpia los selects que se llenan por AJAX (excepto País si quieres)
         limpiarSelect(['nuevoEstado', 'nuevoMunicipio', 'nuevoColonia']);
         
-        // 3. Limpia el campo de CP manualmente
         document.getElementById('nuevoCP').value = '';
         
         console.log("Modal de nueva dirección limpiado.");

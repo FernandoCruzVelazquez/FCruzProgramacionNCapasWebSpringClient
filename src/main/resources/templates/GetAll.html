@@ -282,7 +282,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
 
-      <form th:action="@{/Usuario/update}" method="post">
+      <form th:action="@{/Usuario/DetalleUpdate}" method="post">
 
         <div class="modal-header bg-warning">
           <h5 class="modal-title">Editar Usuario</h5>
@@ -380,7 +380,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Guardar cambios</button>
+          <button type="button" class="btn btn-success" onclick="actualizarUsuario()">Guardar cambios</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         </div>
 

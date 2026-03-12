@@ -4,19 +4,19 @@ package com.digis01.FCruzProgramacionNCapasWebSpring.ML;
 
 public class Direccion {
     
-    private int idDireccion;
+    private Integer idDireccion;
     private String calle;
     private String NumeroIInteriori;
     private String numeroExterior;
     public Colonia colonia;
-    public Usuario Usuario;
-    private int IdUsuario;
+    public Usuario usuario;
+    private Integer IdUsuario;
     
-    public int getIdDireccion(){
+    public Integer getIdDireccion(){
         return idDireccion;
     }
     
-    public void setIdDireccion(int IdDireccion){
+    public void setIdDireccion(Integer IdDireccion){
         this.idDireccion = IdDireccion;
     }
     
@@ -53,18 +53,18 @@ public class Direccion {
     }
     
     public Usuario getUsuario() {
-        return Usuario;
+        return usuario;
     }
 
-    public void setUsuario(Usuario Usuario) {
-        this.Usuario = Usuario;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
     
-    public int getIdUsuario() {
+    public Integer getIdUsuario() {
         return IdUsuario;
     }
 
-    public void setIdUsuario(int IdUsuario) {
+    public void setIdUsuario(Integer IdUsuario) {
         this.IdUsuario = IdUsuario;
     }
 

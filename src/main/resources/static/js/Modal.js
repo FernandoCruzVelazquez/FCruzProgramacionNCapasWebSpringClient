@@ -475,3 +475,64 @@ function confirmarEliminacionUsuario(idUsuario) {
         }
     });
 }
+
+function actualizarUsuario(){
+
+    var usuario = {
+
+        idUsuario: parseInt($("#idUsuario").val()),
+        userName: $("#userName").val(),
+        nombre: $("#nombre").val(),
+        apellidoPaterno: $("#apellidoPaterno").val(),
+        apellidosMaterno: $("#apellidoMaterno").val(),
+        email: $("#email").val(),
+        telefono: $("#telefono").val(),
+        celular: $("#celular").val(),
+        sexo: $("input[name='sexo']:checked").val(),
+        fechaNacimiento: $("#fechaNacimiento").val(),
+
+        password: $("#password").val() || "",
+        curp: $("#curp").val() || "",
+        status: parseInt($("#status").val() || 1),
+
+        rol:{
+            idRol: parseInt($("#rol").val())
+        }
+
+    };
+
+    console.log(usuario);
+
+    $.ajax({
+
+        url: "http://localhost:8080/Api/Usuario/Update",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(usuario),
+
+        success: function(response){
+
+            if(response.correct){
+
+                Swal.fire({
+                    icon:"success",
+                    title:"Usuario actualizado"
+                }).then(()=>{
+                    location.reload();
+                });
+
+            }else{
+
+                Swal.fire({
+                    icon:"error",
+                    title:"Error",
+                    text:response.errorMessage
+                });
+
+            }
+
+        }
+
+    });
+
+}
