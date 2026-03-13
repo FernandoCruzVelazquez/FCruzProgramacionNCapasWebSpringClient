@@ -53,36 +53,32 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("Usuario")
 public class UsuarioController {
 
-    private static String rutaBase = "http://localhost:8080/Api";
+    private static String rutaBase = "http://192.167.1.23:8080/Api";
 
     @GetMapping
     public String Index(Model model) {
-
         RestTemplate restTemplate = new RestTemplate();
 
-        ResponseEntity<List<Usuario>> response =
-                restTemplate.exchange(
-                        rutaBase + "/Usuario/200",
-                        HttpMethod.GET,
-                        HttpEntity.EMPTY,
-                        new ParameterizedTypeReference<List<Usuario>>() {}
-                );
+        ResponseEntity<List<Usuario>> response = restTemplate.exchange(
+                rutaBase + "/Usuario", 
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<List<Usuario>>() {}
+        );
 
-        if(response.getStatusCode().value() == 200){
+        if (response.getStatusCode().is2xxSuccessful()) {
             model.addAttribute("usuarios", response.getBody());
         }
-        
+
         ResponseEntity<Rol[]> responseRoles = restTemplate.getForEntity(rutaBase + "/Rol", Rol[].class);
-        List<Rol> roles = Arrays.asList(responseRoles.getBody());
-        model.addAttribute("roles", roles);
-        
+        model.addAttribute("roles", Arrays.asList(responseRoles.getBody()));
+
         ResponseEntity<Pais[]> responsePaises = restTemplate.getForEntity(rutaBase + "/Pais", Pais[].class);
-        List<Pais> paises = Arrays.asList(responsePaises.getBody());
-        model.addAttribute("paises", paises);
+        model.addAttribute("paises", Arrays.asList(responsePaises.getBody()));
 
         return "GetAll";
     }
-
+    
     @GetMapping("/GetById/{id}")
     @ResponseBody
     public Result getByIdJSON(@PathVariable("id") int id) {
