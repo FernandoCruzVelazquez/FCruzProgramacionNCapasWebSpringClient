@@ -53,16 +53,31 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("Usuario")
 public class UsuarioController {
 
-    private static String rutaBase = "http://192.167.1.23:8080/Api";
+    private static String rutaBase = "http://192.168.100.7:8080/Api";
 
     @GetMapping
-    public String Index(Model model) {
+    public String Index(Model model, HttpSession session) {
+
+        String token = (String) session.getAttribute("token");
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (token == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("user", usuario);
+
         RestTemplate restTemplate = new RestTemplate();
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
         ResponseEntity<List<Usuario>> response = restTemplate.exchange(
-                rutaBase + "/Usuario", 
+                rutaBase + "/Usuario",
                 HttpMethod.GET,
-                HttpEntity.EMPTY,
+                entity,
                 new ParameterizedTypeReference<List<Usuario>>() {}
         );
 
@@ -70,10 +85,22 @@ public class UsuarioController {
             model.addAttribute("usuarios", response.getBody());
         }
 
-        ResponseEntity<Rol[]> responseRoles = restTemplate.getForEntity(rutaBase + "/Rol", Rol[].class);
+        ResponseEntity<Rol[]> responseRoles = restTemplate.exchange(
+                rutaBase + "/Rol",
+                HttpMethod.GET,
+                entity,
+                Rol[].class
+        );
+
         model.addAttribute("roles", Arrays.asList(responseRoles.getBody()));
 
-        ResponseEntity<Pais[]> responsePaises = restTemplate.getForEntity(rutaBase + "/Pais", Pais[].class);
+        ResponseEntity<Pais[]> responsePaises = restTemplate.exchange(
+                rutaBase + "/Pais",
+                HttpMethod.GET,
+                entity, 
+                Pais[].class
+        );
+
         model.addAttribute("paises", Arrays.asList(responsePaises.getBody()));
 
         return "GetAll";
