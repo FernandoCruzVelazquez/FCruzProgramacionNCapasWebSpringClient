@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 @Controller
 public class loginController {
 
-    private final String URL_API = "http://192.168.100.7:8080";
+    private final String URL_API = "http://192.167.0.214:8080";
 
     @GetMapping("/login")
     public String login() {
@@ -47,7 +47,7 @@ public class loginController {
             HttpEntity<String> entity = new HttpEntity<>(headersUser);
 
             ResponseEntity<Usuario> userResponse = restTemplate.exchange(
-                    URL_API + "/Usuario/perfil", // 👈 debes tener este endpoint en tu API
+                    URL_API + "/Usuario/perfil",
                     HttpMethod.GET,
                     entity,
                     Usuario.class
@@ -63,9 +63,9 @@ public class loginController {
     }
 
     
-    @GetMapping("/logout")
+    @PostMapping("/logout") 
     public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login";
+        session.invalidate(); 
+        return "redirect:/login?logout";
     }
 }

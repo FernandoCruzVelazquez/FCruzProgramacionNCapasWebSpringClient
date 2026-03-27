@@ -53,7 +53,7 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("Usuario")
 public class UsuarioController {
 
-    private static String rutaBase = "http://192.168.100.7:8080/Api";
+    private static String rutaBase = "http://192.167.0.214:8080/Api";
 
     @GetMapping
     public String Index(Model model, HttpSession session) {
