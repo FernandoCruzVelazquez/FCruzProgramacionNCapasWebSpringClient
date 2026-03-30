@@ -53,7 +53,7 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("Usuario")
 public class UsuarioController {
 
-    private static String rutaBase = "http://192.167.0.214:8080/Api";
+    private static String rutaBase = "http://localhost:8080/Api";
 
     @GetMapping
     public String Index(Model model, HttpSession session) {
@@ -142,56 +142,145 @@ public class UsuarioController {
         return "GetAll";
     }
     
+//    @GetMapping("form")
+//    public String Accion(Model model) {
+//
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        Usuario usuario = new Usuario();
+//
+//        usuario.setDireccion(new ArrayList<>());
+//        Direccion direccion = new Direccion();
+//
+//        Pais pais = new Pais();
+//        Estado estado = new Estado();
+//        estado.setPais(pais);
+//
+//        Municipio municipio = new Municipio();
+//        municipio.setEstado(estado);
+//
+//        Colonia colonia = new Colonia();
+//        colonia.setMunicipio(municipio);
+//
+//        direccion.setColonia(colonia);
+//
+//        usuario.getDireccion().add(direccion);
+//
+//        model.addAttribute("usuario", usuario);
+//
+//        ResponseEntity<Pais[]> responsePaises =
+//                restTemplate.getForEntity(rutaBase + "/Pais", Pais[].class);
+//
+//        List<Pais> paises = Arrays.asList(responsePaises.getBody());
+//        model.addAttribute("paises", paises);
+//
+//        ResponseEntity<Rol[]> responseRoles =
+//                restTemplate.getForEntity(rutaBase + "/Rol", Rol[].class);
+//
+//        List<Rol> roles = Arrays.asList(responseRoles.getBody());
+//        model.addAttribute("roles", roles);
+//
+//        return "formulario";
+//    }
+    
     @GetMapping("form")
-    public String Accion(Model model) {
-
+    public String Accion(Model model, HttpSession session) {
         RestTemplate restTemplate = new RestTemplate();
+        String token = (String) session.getAttribute("token"); 
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token); 
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
         Usuario usuario = new Usuario();
-
         usuario.setDireccion(new ArrayList<>());
         Direccion direccion = new Direccion();
-
         Pais pais = new Pais();
         Estado estado = new Estado();
         estado.setPais(pais);
-
         Municipio municipio = new Municipio();
         municipio.setEstado(estado);
-
         Colonia colonia = new Colonia();
         colonia.setMunicipio(municipio);
-
         direccion.setColonia(colonia);
-
         usuario.getDireccion().add(direccion);
-
         model.addAttribute("usuario", usuario);
 
-        ResponseEntity<Pais[]> responsePaises =
-                restTemplate.getForEntity(rutaBase + "/Pais", Pais[].class);
+        try {
+            ResponseEntity<Pais[]> responsePaises = restTemplate.exchange(
+                    rutaBase + "/Pais", HttpMethod.GET, requestEntity, Pais[].class);
+            model.addAttribute("paises", Arrays.asList(responsePaises.getBody()));
 
-        List<Pais> paises = Arrays.asList(responsePaises.getBody());
-        model.addAttribute("paises", paises);
+            ResponseEntity<Rol[]> responseRoles = restTemplate.exchange(
+                    rutaBase + "/Rol", HttpMethod.GET, requestEntity, Rol[].class);
+            model.addAttribute("roles", Arrays.asList(responseRoles.getBody()));
 
-        ResponseEntity<Rol[]> responseRoles =
-                restTemplate.getForEntity(rutaBase + "/Rol", Rol[].class);
-
-        List<Rol> roles = Arrays.asList(responseRoles.getBody());
-        model.addAttribute("roles", roles);
+        } catch (Exception e) {
+            System.err.println("Error al cargar catálogos: " + e.getMessage());
+        }
 
         return "formulario";
     }
     
+//    @PostMapping("/form")
+//    public String Accion(@ModelAttribute("usuario") Usuario usuario,  @RequestParam("archivoFoto") MultipartFile archivoFoto, RedirectAttributes redirectAttributes) {
+//
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        try {
+//            HttpHeaders headers = new HttpHeaders(); headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+//
+//            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();body.add("datos", usuario); 
+//
+//            if (archivoFoto != null && !archivoFoto.isEmpty()) {
+//                body.add("imagen", archivoFoto.getResource());
+//            }
+//
+//            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+//
+//            ResponseEntity<Result> response = restTemplate.postForEntity(
+//                    rutaBase + "/Usuario", requestEntity, Result.class);
+//
+//            if (response.getStatusCode().is2xxSuccessful()) {
+//                Result result = response.getBody();
+//                if (result != null && result.isCorrect()) {
+//                    redirectAttributes.addFlashAttribute("success", "¡Excelente! El usuario se guardó con éxito.");
+//                    return "redirect:/Usuario"; 
+//                } else {
+//                    String msg = (result != null) ? result.errorMessage : "No se pudo procesar la solicitud.";
+//                    redirectAttributes.addFlashAttribute("error", msg);
+//                }
+//            } else {
+//                redirectAttributes.addFlashAttribute("error", "El servicio no está disponible en este momento.");
+//            }
+//
+//        } catch (HttpClientErrorException | HttpServerErrorException ex) {
+//            redirectAttributes.addFlashAttribute("error", "Error en el servidor: Inténtelo más tarde.");
+//            System.err.println("Detalle técnico: " + ex.getMessage()); 
+//        } catch (Exception ex) {
+//            redirectAttributes.addFlashAttribute("error", "Ocurrió un problema de conectividad.");
+//            System.err.println("Excepción: " + ex.toString()); 
+//        }
+//
+//        return "redirect:/Usuario/form";
+//    }
+    
     @PostMapping("/form")
-    public String Accion(@ModelAttribute("usuario") Usuario usuario,  @RequestParam("archivoFoto") MultipartFile archivoFoto, RedirectAttributes redirectAttributes) {
+    public String Accion(@ModelAttribute("usuario") Usuario usuario, 
+                         @RequestParam("archivoFoto") MultipartFile archivoFoto, 
+                         RedirectAttributes redirectAttributes, 
+                         HttpSession session) {
 
         RestTemplate restTemplate = new RestTemplate();
+        String token = (String) session.getAttribute("token");
 
         try {
-            HttpHeaders headers = new HttpHeaders(); headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.setBearerAuth(token); 
 
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();body.add("datos", usuario); 
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("datos", usuario); 
 
             if (archivoFoto != null && !archivoFoto.isEmpty()) {
                 body.add("imagen", archivoFoto.getResource());
@@ -208,45 +297,57 @@ public class UsuarioController {
                     redirectAttributes.addFlashAttribute("success", "¡Excelente! El usuario se guardó con éxito.");
                     return "redirect:/Usuario"; 
                 } else {
-                    String msg = (result != null) ? result.errorMessage : "No se pudo procesar la solicitud.";
-                    redirectAttributes.addFlashAttribute("error", msg);
+                    redirectAttributes.addFlashAttribute("error", (result != null) ? result.errorMessage : "Error desconocido.");
                 }
-            } else {
-                redirectAttributes.addFlashAttribute("error", "El servicio no está disponible en este momento.");
             }
 
-        } catch (HttpClientErrorException | HttpServerErrorException ex) {
-            redirectAttributes.addFlashAttribute("error", "Error en el servidor: Inténtelo más tarde.");
-            System.err.println("Detalle técnico: " + ex.getMessage()); 
         } catch (Exception ex) {
-            redirectAttributes.addFlashAttribute("error", "Ocurrió un problema de conectividad.");
-            System.err.println("Excepción: " + ex.toString()); 
+            redirectAttributes.addFlashAttribute("error", "Error de conexión o autorización.");
+            System.err.println("Error: " + ex.getMessage()); 
         }
 
         return "redirect:/Usuario/form";
     }
     
     @GetMapping("/Detalle")
-    public String detalleUsuario(@RequestParam("id") int idUsuario, Model model){
+    public String detalleUsuario(@RequestParam("id") int idUsuario, Model model, HttpSession session) {
+
+        String token = (String) session.getAttribute("token");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         RestTemplate restTemplate = new RestTemplate();
 
-        Result result = restTemplate.getForObject(
-                rutaBase + "/Usuario/Detalle/" + idUsuario,
-                Result.class
-        );
+        try {
+            ResponseEntity<Result> responseResult = restTemplate.exchange(
+                    rutaBase + "/Usuario/Detalle/" + idUsuario,
+                    HttpMethod.GET,
+                    entity,
+                    Result.class
+            );
+            model.addAttribute("usuario", responseResult.getBody().object);
 
-        model.addAttribute("usuario", result.object);
+            ResponseEntity<Pais[]> responsePaises = restTemplate.exchange(
+                    rutaBase + "/Pais",
+                    HttpMethod.GET,
+                    entity,
+                    Pais[].class
+            );
+            model.addAttribute("paises", Arrays.asList(responsePaises.getBody()));
 
-        ResponseEntity<Pais[]> responsePaises =
-                restTemplate.getForEntity(rutaBase + "/Pais", Pais[].class);
+            ResponseEntity<Rol[]> responseRoles = restTemplate.exchange(
+                    rutaBase + "/Rol",
+                    HttpMethod.GET,
+                    entity,
+                    Rol[].class
+            );
+            model.addAttribute("roles", Arrays.asList(responseRoles.getBody()));
 
-        model.addAttribute("paises", Arrays.asList(responsePaises.getBody()));
-
-        ResponseEntity<Rol[]> responseRoles =
-                restTemplate.getForEntity(rutaBase + "/Rol", Rol[].class);
-
-        model.addAttribute("roles", Arrays.asList(responseRoles.getBody()));
+        } catch (Exception e) {
+            return "redirect:/login";
+        }
 
         return "UsuarioDetalle";
     }

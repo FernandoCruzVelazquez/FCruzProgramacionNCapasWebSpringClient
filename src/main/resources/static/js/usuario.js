@@ -222,6 +222,12 @@
 
     $(document).ready(function () {
 
+        $.ajaxSetup({
+            headers: {
+                'Authorization': "Bearer " + jwtToken
+            }
+        });
+
         var cargandoDesdeCP = false;
 
         console.log("Ya termine de cargar la página");
@@ -234,6 +240,11 @@
                     url: "http://localhost:8080/Api/Estado/Pais/" + IdPais, 
                     type: "GET",
                     dataType: 'json',
+
+                    headers: {
+                        "Authorization": "Bearer " + jwtToken
+                    },
+
                     success: function (data) {
 
                         console.log("Todo OK");
@@ -287,6 +298,10 @@
                     type: "GET",
                     dataType: 'json',
 
+                    headers: {
+                        "Authorization": "Bearer " + jwtToken
+                    },
+
                     success: function (data) {
 
                         console.log("Todo OK");
@@ -314,8 +329,14 @@
 
                     },
 
-                    error: function () {
-                        alert("No se pudo procesar la tarea");
+                    error: function (jqXHR) {
+                        console.error("Error: ", jqXHR.status);
+
+                        if (jqXHR.status === 403) {
+                            alert("No tienes permiso o la sesión expiró.");
+                        } else {
+                            alert("Error en la petición");
+                        }
                     }
 
                 });
@@ -331,7 +352,8 @@
 
         console.log("Ya carge municipio ahora colonia");
 
-        $("#ddlmunicipio").change(function () {
+        $("#ddlmunicipio").change(function () {         
+
 
             var IdMunicipio = $("#ddlmunicipio").val();
             if (IdMunicipio != 0) {

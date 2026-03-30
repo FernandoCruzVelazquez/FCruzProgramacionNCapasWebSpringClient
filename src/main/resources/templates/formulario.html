@@ -1,294 +1,298 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymelaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+
 <head>
-    <title>Registro de Usuario</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <title>GetAll</title>
     <link rel="stylesheet" th:href="@{/css/usuario.css}">
-    <script th:src="@{/js/usuario.js}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
-<body class="gradient-custom" th:data-success="${success}" th:data-error="${error}">
+<div layout:fragment="body">
 
-<div class="container py-5">
+    <body class="gradient-custom" th:data-success="${success}" th:data-error="${error}">
 
-
-    <div class="row justify-content-center">
-        <div class="col-lg-10 col-md-12">
-
-            <div class="col-12 mb-3 text-end">
-                <a th:href="@{/Usuario}" class="btn btn-outline-light btn-sm rounded-pill px-4 shadow-sm">
-                    <i class="bi bi-arrow-left me-2"></i>Regresar
-                </a>
-            </div>
-
-            <div class="card shadow-lg rounded-4 border-0 bg-light  ">
-                <div class="card-header bg-primary text-white text-center fw-bold py-3 rounded-top-4">
-                    <h4 class="mb-0">Registro de Usuario</h4>
-                    <small class="opacity-75">Complete la información requerida</small>   
-                </div>
-
-                <div class="card-body p-4">
-
-                    <form method="post" th:object="${usuario}" th:action="@{/Usuario/form}" enctype="multipart/form-data">
-
-                    
-                        <h5 class="text-dark border-bottom border-primary pb-2 mb-3">
-                            <i class="bi bi-person-fill me-2"></i>Datos personales
-                        </h5>
-
-                        <div class="row g-3">
-
-                            
-                            <div class="col-md-12 text-center mb-4">
-
-                                <label class="form-label fw-bold d-block">Foto de Perfil</label>
-
-                                <div class="foto-wrapper rounded-circle overflow-hidden position-relative mx-auto"
-                                    style="width:150px; height:150px; background:#f8f9fa;">
-
-                                    <img id="previewFoto"
-                                        th:if="*{foto != null}"
-                                        th:src="*{foto}"
-                                        class="w-100 h-100"
-                                        style="object-fit:cover;">
-
-                                    <div id="iconoDefault"
-                                        th:if="*{foto == null}"
-                                        class="d-flex align-items-center justify-content-center w-100 h-100">
-                                        <i class="bi bi-person-bounding-box"
-                                        style="font-size:80px; color:#6c757d;"></i>
-                                    </div>
-
-                                </div>
-
-                                <div class="mt-3">
-                                    <input type="file"
-                                        id="archivoFoto"
-                                        name="archivoFoto"
-                                        class="form-control"
-                                        accept="image/*">
-                                </div>
-
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="NombreUsuario" class="form-label fw-bold">Nombre</label>
-                                <input id="NombreUsuario" type="text" class="form-control" th:field="*{nombre}" oncopy="return false" onpaste="return false" oncut="return false" onkeypress="SoloLetras(this, event)" onblur="SoloLetrasBlur(this)" required>
-                                <span id="errorNombreUsuario" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color: red"></span>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="ApellidoPaterno" class="form-label fw-bold">Apellido Paterno</label>
-                                <input id="ApellidoPaterno" type="text" class="form-control" oncopy="return false" onpaste="return false" oncut="return false" th:field="*{apellidoPaterno}" onkeypress="SoloLetras(this, event)" onblur="SoloLetrasBlur(this)" required>
-                                <span id="errorApellidoPaterno" th:if="${#fields.hasErrors('apellidoPaterno')}" th:errors="*{apellidoPaterno}" style="color: red"></span>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="ApellidosMaterno" class="form-label fw-bold">Apellido Materno</label>
-                                <input id="ApellidosMaterno" type="text" class="form-control"  oncopy="return false" onpaste="return false" oncut="return false" th:field="*{apellidosMaterno}" onkeypress="SoloLetras(this, event)" onblur="SoloLetrasBlur(this)">
-                                <span id="errorApellidosMaterno" th:if="${#fields.hasErrors('apellidosMaterno')}" th:errors="*{apellidosMaterno}" style="color: red"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="Email" class="form-label fw-bold">Email</label>
-                                <input type="email" class="form-control" th:field="*{email}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarEmail(this)" required>
-                                <span id="errorEmail" th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="fechaNacimiento" class="form-label fw-bold">Fecha de Nacimiento</label>
-                                <input id="fechaNacimiento" type="date" class="form-control" onkeydown="return false" th:field="*{fechaNacimiento}" onchange="ValidarFechaNacimiento(this)" required/>
-                                <small id="errorFecha"></small>
-                                <span id="errorFechaNacimiento" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}" style="color:red"></span>
-                            </div>
+        <div class="container py-5">
 
 
-                            <div class="col-md-6">
-                                <label class="fw-bold d-block mb-3">Sexo</label>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-md-12">
 
-                                <div class="d-flex gap-4">
+                    <div class="col-12 mb-3 text-end">
+                        <a th:href="@{/Usuario}" class="btn btn-outline-light btn-sm rounded-pill px-4 shadow-sm">
+                            <i class="bi bi-arrow-left me-2"></i>Regresar
+                        </a>
+                    </div>
 
-                                    <div class="form-check">
-                                        <input class="form-check-input fs-5"
-                                            type="radio"
-                                            name="sexo"
-                                            id="sexoM"
-                                            value="M"
-                                            th:checked="*{sexo == 'M'}"
-                                            required>
-
-                                        <label class="form-check-label fw-semibold ms-1"
-                                            for="sexoM">
-                                            Masculino
-                                        </label>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input fs-5"
-                                            type="radio"
-                                            name="sexo"
-                                            id="sexoF"
-                                            value="F"
-                                            th:checked="*{sexo == 'F'}">
-
-                                        <label class="form-check-label fw-semibold ms-1"
-                                            for="sexoF">
-                                            Femenino
-                                        </label>
-                                    </div>
-
-                                </div>
-
-                                <div class="invalid-feedback d-block">
-                                    <span th:if="${#fields.hasErrors('sexo')}"
-                                        th:errors="*{sexo}"></span>
-                                </div>
-                            </div>
-
-
-                            <div class="col-md-3">
-                                <label for="Teléfono" class="form-label fw-bold">Teléfono</label>
-                                <input id="Teléfono" type="text" class="form-control" th:field="*{telefono}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarTelefono(this)">
-                                <span id="errorTelefono" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" style="color:red"></span>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label for="celular" class="form-label fw-bold">Celular</label>
-                                <input id="celular" type="text" class="form-control" th:field="*{celular}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarTelefono(this)">
-                                <span id="errorCelular" th:if="${#fields.hasErrors('celular')}" th:errors="*{celular}" style="color:red"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="CURP" class="form-label fw-bold">CURP</label>
-                                <input id="CURP" type="text" class="form-control" th:field="*{CURP}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarCURP(this)" style="text-transform:uppercase">
-                                <span id="errorCURP" th:if="${#fields.hasErrors('CURP')}" th:errors="*{CURP}" style="color:red"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="userName" class="form-label fw-bold">Username</label>
-                                <input id="UserName" type="text" class="form-control" th:field="*{userName}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarUsername(this)" required>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="Password" class="form-label fw-bold">Password</label>
-                                <input id="Password" type="password" class="form-control" th:field="*{password}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarPassword(this)" required>
-                                <span id="errorPassword" th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red"></span>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label for="Rolddl" class="form-label fw-bold">Rol</label>
-                                <select class="form-select" th:field="*{rol.idRol}">
-                                    <option value="">-- Seleccione un rol --</option>
-                                    <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.nombreRol}" required>
-                                    </option>
-                                </select>
-                            </div>
+                    <div class="card shadow-lg rounded-4 border-0 bg-light  ">
+                        <div class="card-header bg-primary text-white text-center fw-bold py-3 rounded-top-4">
+                            <h4 class="mb-0">Registro de Usuario</h4>
+                            <small class="opacity-75">Complete la información requerida</small>   
                         </div>
 
-                        <div class="card mt-4 shadow-sm border-0">
-                            <div class="card-header bg-danger text-white">
-                                Direcciones
-                            </div>
+                        <div class="card-body p-4">
 
-                            <div class="card-body bg-white" id="contenedorDirecciones">
+                            <form method="post" th:object="${usuario}" th:action="@{/Usuario/form}" enctype="multipart/form-data">
 
-                                <div th:each="direccion, iterStat : *{direccion}" 
-                                     class="row g-3 mb-4 pb-3 border-bottom direccion-item">
+                            
+                                <h5 class="text-dark border-bottom border-primary pb-2 mb-3">
+                                    <i class="bi bi-person-fill me-2"></i>Datos personales
+                                </h5>
+
+                                <div class="row g-3">
+
                                     
+                                    <div class="col-md-12 text-center mb-4">
+
+                                        <label class="form-label fw-bold d-block">Foto de Perfil</label>
+
+                                        <div class="foto-wrapper rounded-circle overflow-hidden position-relative mx-auto"
+                                            style="width:150px; height:150px; background:#f8f9fa;">
+
+                                            <img id="previewFoto"
+                                                th:if="*{foto != null}"
+                                                th:src="*{foto}"
+                                                class="w-100 h-100"
+                                                style="object-fit:cover;">
+
+                                            <div id="iconoDefault"
+                                                th:if="*{foto == null}"
+                                                class="d-flex align-items-center justify-content-center w-100 h-100">
+                                                <i class="bi bi-person-bounding-box"
+                                                style="font-size:80px; color:#6c757d;"></i>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <input type="file"
+                                                id="archivoFoto"
+                                                name="archivoFoto"
+                                                class="form-control"
+                                                accept="image/*">
+                                        </div>
+
+                                    </div>
 
                                     <div class="col-md-4">
-                                        <label for="calle" class="form-label fw-bold">Calle</label>
-                                        <input id="calle" type="text" class="form-control" th:field="*{direccion[__${iterStat.index}__].calle}" oncopy="return false" onpaste="return false" oncut="return false" required>
-                                        <span id="errorCalle" th:if="${#fields.hasErrors('direccion[__${iterStat.index}__].calle')}" th:errors="*{direccion[__${iterStat.index}__].calle}" style="color:red"></span>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label for="numeroIInteriori" class="form-label fw-bold">Número interior</label>
-                                        <input type="text" class="form-control" th:field="*{direccion[__${iterStat.index}__].numeroIInteriori}" oncopy="return false" onpaste="return false" oncut="return false" required>
-                                        <span id="errorNumeroIInteriori" th:if="${#fields.hasErrors('direccion[__${iterStat.index}__].numeroIInteriori')}" th:errors="*{direccion[__${iterStat.index}__].numeroIInteriori}" style="color:red"></span>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label for="numeroExterior" class="form-label fw-bold">Número exterior</label>
-                                        <input type="text" class="form-control" th:field="*{direccion[__${iterStat.index}__].numeroExterior}" oncopy="return false" onpaste="return false" oncut="return false" required>
-                                        <span id="errorNumeroExterior" th:if="${#fields.hasErrors('direccion[__${iterStat.index}__].numeroExterior')}" th:errors="*{direccion[__${iterStat.index}__].numeroExterior}" style="color:red"></span>
+                                        <label for="NombreUsuario" class="form-label fw-bold">Nombre</label>
+                                        <input id="NombreUsuario" type="text" class="form-control" th:field="*{nombre}" oncopy="return false" onpaste="return false" oncut="return false" onkeypress="SoloLetras(this, event)" onblur="SoloLetrasBlur(this)" required>
+                                        <span id="errorNombreUsuario" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color: red"></span>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="paisddl" class="form-label fw-bold">País</label>
-                                        <select class="form-select" id="ddlpais" th:field="*{direccion[__${iterStat.index}__].colonia.municipio.estado.pais.idPais}">
-                                            <option value="">-- Seleccione un país --</option>
-                                            <option th:each="paisItem : ${paises}" th:value="${paisItem.idPais}" th:text="${paisItem.nombre}">
+                                        <label for="ApellidoPaterno" class="form-label fw-bold">Apellido Paterno</label>
+                                        <input id="ApellidoPaterno" type="text" class="form-control" oncopy="return false" onpaste="return false" oncut="return false" th:field="*{apellidoPaterno}" onkeypress="SoloLetras(this, event)" onblur="SoloLetrasBlur(this)" required>
+                                        <span id="errorApellidoPaterno" th:if="${#fields.hasErrors('apellidoPaterno')}" th:errors="*{apellidoPaterno}" style="color: red"></span>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="ApellidosMaterno" class="form-label fw-bold">Apellido Materno</label>
+                                        <input id="ApellidosMaterno" type="text" class="form-control"  oncopy="return false" onpaste="return false" oncut="return false" th:field="*{apellidosMaterno}" onkeypress="SoloLetras(this, event)" onblur="SoloLetrasBlur(this)">
+                                        <span id="errorApellidosMaterno" th:if="${#fields.hasErrors('apellidosMaterno')}" th:errors="*{apellidosMaterno}" style="color: red"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="Email" class="form-label fw-bold">Email</label>
+                                        <input type="email" class="form-control" th:field="*{email}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarEmail(this)" required>
+                                        <span id="errorEmail" th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="fechaNacimiento" class="form-label fw-bold">Fecha de Nacimiento</label>
+                                        <input id="fechaNacimiento" type="date" class="form-control" onkeydown="return false" th:field="*{fechaNacimiento}" onchange="ValidarFechaNacimiento(this)" required/>
+                                        <small id="errorFecha"></small>
+                                        <span id="errorFechaNacimiento" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}" style="color:red"></span>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <label class="fw-bold d-block mb-3">Sexo</label>
+
+                                        <div class="d-flex gap-4">
+
+                                            <div class="form-check">
+                                                <input class="form-check-input fs-5"
+                                                    type="radio"
+                                                    name="sexo"
+                                                    id="sexoM"
+                                                    value="M"
+                                                    th:checked="*{sexo == 'M'}"
+                                                    required>
+
+                                                <label class="form-check-label fw-semibold ms-1"
+                                                    for="sexoM">
+                                                    Masculino
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input class="form-check-input fs-5"
+                                                    type="radio"
+                                                    name="sexo"
+                                                    id="sexoF"
+                                                    value="F"
+                                                    th:checked="*{sexo == 'F'}">
+
+                                                <label class="form-check-label fw-semibold ms-1"
+                                                    for="sexoF">
+                                                    Femenino
+                                                </label>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="invalid-feedback d-block">
+                                            <span th:if="${#fields.hasErrors('sexo')}"
+                                                th:errors="*{sexo}"></span>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-3">
+                                        <label for="Teléfono" class="form-label fw-bold">Teléfono</label>
+                                        <input id="Teléfono" type="text" class="form-control" th:field="*{telefono}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarTelefono(this)">
+                                        <span id="errorTelefono" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" style="color:red"></span>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="celular" class="form-label fw-bold">Celular</label>
+                                        <input id="celular" type="text" class="form-control" th:field="*{celular}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarTelefono(this)">
+                                        <span id="errorCelular" th:if="${#fields.hasErrors('celular')}" th:errors="*{celular}" style="color:red"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="CURP" class="form-label fw-bold">CURP</label>
+                                        <input id="CURP" type="text" class="form-control" th:field="*{CURP}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarCURP(this)" style="text-transform:uppercase">
+                                        <span id="errorCURP" th:if="${#fields.hasErrors('CURP')}" th:errors="*{CURP}" style="color:red"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="userName" class="form-label fw-bold">Username</label>
+                                        <input id="UserName" type="text" class="form-control" th:field="*{userName}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarUsername(this)" required>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="Password" class="form-label fw-bold">Password</label>
+                                        <input id="Password" type="password" class="form-control" th:field="*{password}" oncopy="return false" onpaste="return false" oncut="return false" onblur="ValidarPassword(this)" required>
+                                        <span id="errorPassword" th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red"></span>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="Rolddl" class="form-label fw-bold">Rol</label>
+                                        <select class="form-select" th:field="*{rol.idRol}">
+                                            <option value="">-- Seleccione un rol --</option>
+                                            <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.nombreRol}" required>
                                             </option>
                                         </select>
                                     </div>
-                                    
-                                    <div class="col-md-3">
-                                        <label for="Estadoddl" class="form-label fw-bold">Estado</label>
-                                        <select id="ddlestado" class="form-select" th:field="*{direccion[__${iterStat.index}__].colonia.municipio.estado.idEstado}">
-                                            <option value="" disabled selected>-- Seleccione un estado --</option>
-                                            <option th:each="estadoItem : ${estados}" th:value="${estadoItem.idEstado}" th:text="${estadoItem.nombre}"></option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label for="municipioddl" class="form-label fw-bold"  th:field="*{direccion[__${iterStat.index}__].colonia.municipio.idMunicipio}">Municipio</label>
-                                        <select id="ddlmunicipio" class="form-select" aria-label="Default select example">
-                                            <option value="" disabled selected>-- Seleccione un municipio --</option>
-                                            <option th:each="municipioItem : ${municipios}" th:value="${municipioItem.idMunicipio}" th:text="${municipioItem.nombre}"></option>
-                                        </select>
-                                    </div>
-                                    
-                                    
-                                    <div class="col-md-3">
-                                        <label for="coloniaddl" class="form-label fw-bold">Colonia</label>
-                                        <select id="ddlcolonia" class="form-select " aria-label="Default select example" th:field="*{direccion[__${iterStat.index}__].colonia.idColonia}">
-                                            <option value="" disabled selected>-- Selecciona una colonia --</option>
-                                            <option th:each="coloniaItem : ${colonias}" th:value="${coloniaItem.idColonia}" th:text="${coloniaItem.nombre}"></option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label for="codigoPostal" class="form-label fw-bold">Código Postal</label>
-                                        <input id="codigoPostal" type="text" class="form-control" th:field="*{direccion[__${iterStat.index}__].colonia.codigoPostal}">
-                                    </div>
-
-                                    
                                 </div>
 
-                            </div>
-                        </div>
+                                <div class="card mt-4 shadow-sm border-0">
+                                    <div class="card-header bg-danger text-white">
+                                        Direcciones
+                                    </div>
 
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-success rounded-pill px-5 me-2">
-                                <i class="bi bi-check-circle me-2"></i>Guardar
-                            </button>
-                            <button type="reset" class="btn btn-outline-danger rounded-pill px-5">
-                                <i class="bi bi-trash me-2"></i>Limpiar
-                            </button>
-                        </div>
+                                    <div class="card-body bg-white" id="contenedorDirecciones">
 
-                    </form>
+                                        <div th:each="direccion, iterStat : *{direccion}" 
+                                            class="row g-3 mb-4 pb-3 border-bottom direccion-item">
+                                            
+
+                                            <div class="col-md-4">
+                                                <label for="calle" class="form-label fw-bold">Calle</label>
+                                                <input id="calle" type="text" class="form-control" th:field="*{direccion[__${iterStat.index}__].calle}" oncopy="return false" onpaste="return false" oncut="return false" required>
+                                                <span id="errorCalle" th:if="${#fields.hasErrors('direccion[__${iterStat.index}__].calle')}" th:errors="*{direccion[__${iterStat.index}__].calle}" style="color:red"></span>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label for="numeroIInteriori" class="form-label fw-bold">Número interior</label>
+                                                <input type="text" class="form-control" th:field="*{direccion[__${iterStat.index}__].numeroIInteriori}" oncopy="return false" onpaste="return false" oncut="return false" required>
+                                                <span id="errorNumeroIInteriori" th:if="${#fields.hasErrors('direccion[__${iterStat.index}__].numeroIInteriori')}" th:errors="*{direccion[__${iterStat.index}__].numeroIInteriori}" style="color:red"></span>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label for="numeroExterior" class="form-label fw-bold">Número exterior</label>
+                                                <input type="text" class="form-control" th:field="*{direccion[__${iterStat.index}__].numeroExterior}" oncopy="return false" onpaste="return false" oncut="return false" required>
+                                                <span id="errorNumeroExterior" th:if="${#fields.hasErrors('direccion[__${iterStat.index}__].numeroExterior')}" th:errors="*{direccion[__${iterStat.index}__].numeroExterior}" style="color:red"></span>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label for="paisddl" class="form-label fw-bold">País</label>
+                                                <select class="form-select" id="ddlpais" th:field="*{direccion[__${iterStat.index}__].colonia.municipio.estado.pais.idPais}">
+                                                    <option value="">-- Seleccione un país --</option>
+                                                    <option th:each="paisItem : ${paises}" th:value="${paisItem.idPais}" th:text="${paisItem.nombre}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="col-md-3">
+                                                <label for="Estadoddl" class="form-label fw-bold">Estado</label>
+                                                <select id="ddlestado" class="form-select" th:field="*{direccion[__${iterStat.index}__].colonia.municipio.estado.idEstado}">
+                                                    <option value="" disabled selected>-- Seleccione un estado --</option>
+                                                    <option th:each="estadoItem : ${estados}" th:value="${estadoItem.idEstado}" th:text="${estadoItem.nombre}"></option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label for="municipioddl" class="form-label fw-bold"  th:field="*{direccion[__${iterStat.index}__].colonia.municipio.idMunicipio}">Municipio</label>
+                                                <select id="ddlmunicipio" class="form-select" aria-label="Default select example">
+                                                    <option value="" disabled selected>-- Seleccione un municipio --</option>
+                                                    <option th:each="municipioItem : ${municipios}" th:value="${municipioItem.idMunicipio}" th:text="${municipioItem.nombre}"></option>
+                                                </select>
+                                            </div>
+                                            
+                                            
+                                            <div class="col-md-3">
+                                                <label for="coloniaddl" class="form-label fw-bold">Colonia</label>
+                                                <select id="ddlcolonia" class="form-select " aria-label="Default select example" th:field="*{direccion[__${iterStat.index}__].colonia.idColonia}">
+                                                    <option value="" disabled selected>-- Selecciona una colonia --</option>
+                                                    <option th:each="coloniaItem : ${colonias}" th:value="${coloniaItem.idColonia}" th:text="${coloniaItem.nombre}"></option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label for="codigoPostal" class="form-label fw-bold">Código Postal</label>
+                                                <input id="codigoPostal" type="text" class="form-control" th:field="*{direccion[__${iterStat.index}__].colonia.codigoPostal}">
+                                            </div>
+
+                                            
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-success rounded-pill px-5 me-2">
+                                        <i class="bi bi-check-circle me-2"></i>Guardar
+                                    </button>
+                                    <button type="reset" class="btn btn-outline-danger rounded-pill px-5">
+                                        <i class="bi bi-trash me-2"></i>Limpiar
+                                    </button>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
 
                 </div>
             </div>
 
         </div>
-    </div>
+
+        <script th:inline="javascript">
+            var jwtToken = [[${session.token}]];    
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script th:src="@{/js/usuario.js}"></script>
+        <script th:src="@{/js/Alert.js}"></script>
+
+    </body>
 
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/usuario.js}"></script>
-<script th:src="@{/js/Alert.js}"></script>
-
-</body>
 
 </html>

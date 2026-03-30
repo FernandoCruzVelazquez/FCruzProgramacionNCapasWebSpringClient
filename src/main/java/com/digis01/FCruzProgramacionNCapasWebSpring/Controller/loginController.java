@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 @Controller
 public class loginController {
 
-    private final String URL_API = "http://192.167.0.214:8080";
+    private final String URL_API = "http://localhost:8080";
 
     @GetMapping("/login")
     public String login() {

@@ -24,7 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("CargaMasiva")
 public class CargaMasivaController {
     
-    private static String rutaBase = "http://192.167.0.214:8080/ApiCM";
+    private static String rutaBase = "http://localhost:8080/ApiCM";
     
     @GetMapping
     public String CargaMasiva() {
