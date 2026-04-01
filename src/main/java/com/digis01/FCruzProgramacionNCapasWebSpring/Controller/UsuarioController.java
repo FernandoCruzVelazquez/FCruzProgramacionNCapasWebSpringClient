@@ -47,6 +47,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 
 @Controller
@@ -185,25 +186,38 @@ public class UsuarioController {
     
     @GetMapping("form")
     public String Accion(Model model, HttpSession session) {
+
+        String token = (String) session.getAttribute("token");
+
+        // 🔒 PROTEGER RUTA
+        if (token == null) {
+            return "redirect:/login";
+        }
+
         RestTemplate restTemplate = new RestTemplate();
-        String token = (String) session.getAttribute("token"); 
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token); 
+        headers.setBearerAuth(token);
+
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
         Usuario usuario = new Usuario();
         usuario.setDireccion(new ArrayList<>());
+
         Direccion direccion = new Direccion();
         Pais pais = new Pais();
         Estado estado = new Estado();
         estado.setPais(pais);
+
         Municipio municipio = new Municipio();
         municipio.setEstado(estado);
+
         Colonia colonia = new Colonia();
         colonia.setMunicipio(municipio);
+
         direccion.setColonia(colonia);
         usuario.getDireccion().add(direccion);
+
         model.addAttribute("usuario", usuario);
 
         try {
@@ -271,39 +285,56 @@ public class UsuarioController {
                          RedirectAttributes redirectAttributes, 
                          HttpSession session) {
 
-        RestTemplate restTemplate = new RestTemplate();
         String token = (String) session.getAttribute("token");
+
+        if (token == null) {
+            return "redirect:/login";
+        }
+
+        RestTemplate restTemplate = new RestTemplate();
 
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-            headers.setBearerAuth(token); 
+            headers.setBearerAuth(token);
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA); // 🔥 CLAVE
 
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("datos", usuario); 
+
+            ObjectMapper mapper = new ObjectMapper();
+            String usuarioJson = mapper.writeValueAsString(usuario);
+
+            HttpHeaders jsonHeaders = new HttpHeaders();
+            jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> jsonPart = new HttpEntity<>(usuarioJson, jsonHeaders);
+
+            body.add("datos", jsonPart);
 
             if (archivoFoto != null && !archivoFoto.isEmpty()) {
                 body.add("imagen", archivoFoto.getResource());
             }
 
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity =
+                    new HttpEntity<>(body, headers);
 
             ResponseEntity<Result> response = restTemplate.postForEntity(
                     rutaBase + "/Usuario", requestEntity, Result.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 Result result = response.getBody();
+
                 if (result != null && result.isCorrect()) {
-                    redirectAttributes.addFlashAttribute("success", "¡Excelente! El usuario se guardó con éxito.");
-                    return "redirect:/Usuario"; 
+                    redirectAttributes.addFlashAttribute("success", "¡Usuario guardado correctamente!");
+                    return "redirect:/Usuario";
                 } else {
-                    redirectAttributes.addFlashAttribute("error", (result != null) ? result.errorMessage : "Error desconocido.");
+                    redirectAttributes.addFlashAttribute("error",
+                            (result != null) ? result.errorMessage : "Error desconocido.");
                 }
             }
 
         } catch (Exception ex) {
+            System.err.println("ERROR REAL: " + ex.getMessage()); // 🔥 importante
             redirectAttributes.addFlashAttribute("error", "Error de conexión o autorización.");
-            System.err.println("Error: " + ex.getMessage()); 
         }
 
         return "redirect:/Usuario/form";
